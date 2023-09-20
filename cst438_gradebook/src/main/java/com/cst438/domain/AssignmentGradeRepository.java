@@ -1,5 +1,7 @@
 package com.cst438.domain;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -10,5 +12,10 @@ public interface AssignmentGradeRepository extends CrudRepository <AssignmentGra
 	AssignmentGrade findByAssignmentIdAndStudentEmail(
 			@Param("assignmentId") int assignmentId, 
 			@Param("email") String email );
+
+	static List<AssignmentGrade> findByAssignment(Assignment assignment) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
