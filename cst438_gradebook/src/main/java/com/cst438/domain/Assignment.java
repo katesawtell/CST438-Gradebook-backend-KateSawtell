@@ -37,6 +37,10 @@ public class Assignment {
 		this.dueDate = dueDate;
 	}
 	
+	public Assignment() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getId() {
 		return id;
 	}

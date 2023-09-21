@@ -5,6 +5,10 @@ public record AssignmentDTO(int id, String assignmentName, String dueDate, Strin
 	public AssignmentDTO(String assignmentName, String dueDate, String courseTitle, int courseId) {
         this(0, assignmentName, dueDate, courseTitle, courseId);
 	}
+	
+	public int getId() {
+		return id;
+	}
 
 	public String assignmentName() {
 		return assignmentName;
@@ -21,6 +25,13 @@ public record AssignmentDTO(int id, String assignmentName, String dueDate, Strin
 	public int courseId() {
 		return courseId;
 	}
+
+
+
+
+	
+
+
 	
 	
 	

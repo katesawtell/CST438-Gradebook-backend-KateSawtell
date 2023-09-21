@@ -5,16 +5,24 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.cst438.controllers.AssignmentController;
 import com.cst438.domain.Assignment;
 import com.cst438.domain.AssignmentDTO;
+import com.cst438.domain.AssignmentGrade;
+import com.cst438.domain.AssignmentGradeRepository;
 import com.cst438.domain.AssignmentRepository;
+import com.cst438.domain.Course;
+import com.cst438.domain.CourseRepository;
+import com.cst438.domain.Enrollment;
 
 import java.sql.Date;
 import java.util.ArrayList;
@@ -28,24 +36,26 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest
 public class JunitTestAssignment {
 
-    @Mock
+	@Autowired
+	private MockMvc mvc;
+	
+    @Autowired
     private AssignmentRepository assignmentRepository;
 
-    @InjectMocks
+    @Autowired
     private AssignmentController assignmentController;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
+    //test if this gets all assignments for the instructor
     @Test
     public void testGetAllAssignmentsForInstructor() {
         // Mock data
         String instructorEmail = "dwisneski@csumb.edu";
         List<Assignment> mockAssignments = new ArrayList<>();
-        mockAssignments.add(new Assignment(1, "Assignment 1", Date.valueOf("2023-09-20"), new Course("Course 1", "CS101")));
-        mockAssignments.add(new Assignment(2, "Assignment 2", Date.valueOf("2023-09-21"), new Course("Course 2", "CS102")));
+        Course mockCourse = new Course ("course 1", "wisneski", 2023, "Fall");
+;
+        mockAssignments.add(new Assignment(mockCourse, null, "Assignment 1", Date.valueOf("2023-09-20")));
+        mockAssignments.add(new Assignment(mockCourse, null, "Assignment 2", Date.valueOf("2023-09-20")));        
+
 
         // Mock behavior of assignmentRepository.findByEmail
         when(assignmentRepository.findByEmail(instructorEmail)).thenReturn(mockAssignments);
@@ -60,16 +70,17 @@ public class JunitTestAssignment {
         AssignmentDTO[] assignmentDTOs = responseEntity.getBody();
         assertEquals(2, assignmentDTOs.length);
         assertEquals(1, assignmentDTOs[0].getId());
-        assertEquals("Assignment 1", assignmentDTOs[0].getAssignmentName());
-        assertEquals("2023-09-20", assignmentDTOs[0].getDueDate());
-        assertEquals("Course 1", assignmentDTOs[0].getCourseTitle());
-        assertEquals("CS101", assignmentDTOs[0].getCourseId());
+        assertEquals("Assignment 1", assignmentDTOs[0].assignmentName());
+        assertEquals("2023-09-20", assignmentDTOs[0].dueDate());
+        assertEquals("Course 1", assignmentDTOs[0].courseTitle());
+        assertEquals("CS101", assignmentDTOs[0].courseId());
         // Check other assertions for the second assignment DTO
     }
     @Test
     public void testGetAssignment() {
         int assignmentId = 1;
-        Assignment mockAssignment = new Assignment(assignmentId, "Assignment 1", Date.valueOf("2023-09-20"), new Course("Course 1", "CS101"));
+        Course mockCourse = new Course ("course 1", "wisneski", 2023, "Fall");
+        Assignment mockAssignment = new Assignment(mockCourse, null, "Assignment 2", Date.valueOf("2023-09-20"));
 
         when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(mockAssignment));
 
@@ -79,10 +90,10 @@ public class JunitTestAssignment {
 
         AssignmentDTO assignmentDTO = responseEntity.getBody();
         assertEquals(assignmentId, assignmentDTO.getId());
-        assertEquals("Assignment 1", assignmentDTO.getAssignmentName());
-        assertEquals("2023-09-20", assignmentDTO.getDueDate());
-        assertEquals("Course 1", assignmentDTO.getCourseTitle());
-        assertEquals("CS101", assignmentDTO.getCourseId());
+        assertEquals("Assignment 1", assignmentDTO.assignmentName());
+        assertEquals("2023-09-20", assignmentDTO.dueDate());
+        assertEquals("Course 1", assignmentDTO.courseTitle());
+        assertEquals("CS101", assignmentDTO.courseId());
     }
 
     @Test(expected = ResponseStatusException.class)
@@ -96,11 +107,13 @@ public class JunitTestAssignment {
 
     @Test
     public void testCreateAssignment() {
-        AssignmentDTO requestDTO = new AssignmentDTO("New Assignment", "2023-09-22", "New Course", "CS102");
-        Course mockCourse = new Course("New Course", "CS102");
+		MockHttpServletResponse response;
+        Course mockCourse = new Course ("course 2", "wisneski", 2023, "Fall");
 
-        when(courseRepository.findById("CS102")).thenReturn(Optional.of(mockCourse));
-        when(assignmentRepository.save(any())).thenReturn(new Assignment(1, requestDTO.getAssignmentName(), Date.valueOf(requestDTO.getDueDate()), mockCourse));
+        Assignment mockAssignment = new Assignment(mockCourse, null, "Assignment 2", Date.valueOf("2023-09-20"));
+
+        when(courseRepository.findById(0)).thenReturn(Optional.of(mockCourse));
+        when(assignmentRepository.save(any())).thenReturn(new Assignment(1, assignmentDTO.assignmentName(), Date.valueOf(requestDTO.dueDate(), mockCourse));
 
         ResponseEntity<Integer> responseEntity = assignmentController.createAssignment(requestDTO);
 
@@ -110,7 +123,7 @@ public class JunitTestAssignment {
 
     @Test(expected = ResponseStatusException.class)
     public void testCreateAssignmentCourseNotFound() {
-        AssignmentDTO requestDTO = new AssignmentDTO("New Assignment", "2023-09-22", "Nonexistent Course", "CS103");
+        AssignmentDTO requestDTO = new AssignmentDTO("New Assignment", "2023-09-22", "Nonexistent Course", 102);
 
         when(courseRepository.findById("CS103")).thenReturn(Optional.empty());
 
@@ -120,8 +133,9 @@ public class JunitTestAssignment {
     @Test
     public void testUpdateAssignment() {
         int assignmentId = 1;
-        AssignmentDTO requestDTO = new AssignmentDTO("Updated Assignment", "2023-09-23", "Updated Course", "CS103");
-        Assignment mockAssignment = new Assignment(assignmentId, "Original Assignment", Date.valueOf("2023-09-20"), new Course("Original Course", "CS101"));
+        Course mockCourse = new Course ("course 3", "wisneski", 2023, "Fall");
+        AssignmentDTO requestDTO = new AssignmentDTO("Updated Assignment", "2023-09-23", "Updated Course", 102);
+        Assignment mockAssignment = new Assignment(mockCourse, null, "Assignment 1", Date.valueOf("2023-09-20")));
 
         when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(mockAssignment));
         when(assignmentRepository.save(any())).thenReturn(new Assignment(assignmentId, requestDTO.getAssignmentName(), Date.valueOf(requestDTO.getDueDate()), new Course(requestDTO.getCourseTitle(), requestDTO.getCourseId())));
@@ -134,7 +148,7 @@ public class JunitTestAssignment {
     @Test(expected = ResponseStatusException.class)
     public void testUpdateAssignmentNotFound() {
         int assignmentId = 1;
-        AssignmentDTO requestDTO = new AssignmentDTO("Updated Assignment", "2023-09-23", "Updated Course", "CS103");
+        AssignmentDTO requestDTO = new AssignmentDTO("Updated Assignment", "2023-09-23", "Updated Course", 102);
 
         when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.empty());
 
@@ -144,7 +158,8 @@ public class JunitTestAssignment {
     @Test
     public void testDeleteAssignment() {
         int assignmentId = 1;
-        Assignment mockAssignment = new Assignment(assignmentId, "Assignment 1", Date.valueOf("2023-09-20"), new Course("Course 1", "CS101"));
+        Course mockCourse = new Course ("course 1", "wisneski", 2023, "Fall");
+        Assignment mockAssignment = new Assignment(mockCourse, null, "Assignment 1", Date.valueOf("2023-09-20"));
         List<AssignmentGrade> mockGrades = new ArrayList<>();
 
         when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(mockAssignment));
@@ -159,9 +174,9 @@ public class JunitTestAssignment {
     @Test
     public void testDeleteAssignmentWithGrades() {
         int assignmentId = 1;
-        Assignment mockAssignment = new Assignment(assignmentId, "Assignment 1", Date.valueOf("2023-09-20"), new Course("Course 1", "CS101"));
+        Course mockCourse = new Course ("course 1", "wisneski", 2023, "Fall");
+        Assignment mockAssignment = new Assignment(mockCourse, null, "Assignment 1", Date.valueOf("2023-09-20"));
         List<AssignmentGrade> mockGrades = new ArrayList<>();
-        mockGrades.add(new AssignmentGrade(mockAssignment, new Enrollment(), 90));
 
         when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(mockAssignment));
         when(AssignmentGradeRepository.findByAssignment(mockAssignment)).thenReturn(mockGrades);
