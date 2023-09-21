@@ -27,8 +27,20 @@ public class Assignment {
 	
 	private String name;
 	private Date dueDate;
-
 	
+	
+	public Assignment(Course course, List<AssignmentGrade> assignmentGrades, String name, Date dueDate) {
+		super();
+		this.course = course;
+		this.assignmentGrades = assignmentGrades;
+		this.name = name;
+		this.dueDate = dueDate;
+	}
+	
+	public Assignment() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getId() {
 		return id;
 	}

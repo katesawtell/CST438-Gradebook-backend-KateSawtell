@@ -25,6 +25,13 @@ public class Course {
 	@OneToMany(mappedBy="course")
 	List<Assignment> assignments = new ArrayList<>();
 	
+    public Course(String title, String instructor, int year, String semester) {
+        this.title = title;
+        this.instructor = instructor;
+        this.year = year;
+        this.semester = semester;
+    }
+	
 	public int getCourse_id() {
 		return course_id;
 	}
