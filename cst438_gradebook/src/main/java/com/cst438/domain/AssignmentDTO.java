@@ -6,34 +6,5 @@ public record AssignmentDTO(int id, String assignmentName, String dueDate, Strin
         this(0, assignmentName, dueDate, courseTitle, courseId);
 	}
 	
-	public int getId() {
-		return id;
-	}
-
-	public String assignmentName() {
-		return assignmentName;
-	}
-
-	public String dueDate() {
-		return dueDate;
-	}
-
-	public String courseTitle() {
-		return courseTitle;
-	}
-
-	public int courseId() {
-		return courseId;
-	}
-
-
-
-
-	
-
-
-	
-	
-	
 }
 
