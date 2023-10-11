@@ -35,7 +35,7 @@ public class RegistrationServiceREST implements RegistrationService {
 	@Override
 	public void sendFinalGrades(int course_id , FinalGradeDTO[] grades) { 
 		
-		//TODO use restTemplate to send final grades to registration service
+		restTemplate.postForEntity(registration_url + "/grades?course_id=" + course_id, grades, ResponseEntity.class);
 		
 	}
 	

@@ -8,11 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.cst438.domain.Course;
 import com.cst438.domain.FinalGradeDTO;
 import com.cst438.domain.CourseRepository;
-import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentDTO;
 import com.cst438.domain.EnrollmentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,8 +42,12 @@ public class RegistrationServiceMQ implements RegistrationService {
 	public void receive(String message) {
 		
 		System.out.println("Gradebook has received: "+message);
+		    
+	    // Deserialize the message to EnrollmentDTO and update the database
+		EnrollmentDTO enrollmentDTO = fromJsonString(message, EnrollmentDTO.class);
 
-		//TODO  deserialize message to EnrollmentDTO and update database
+	    // You can use your EnrollmentRepository to save the received enrollment data.
+	    enrollmentRepository.save(enrollmentDTO);
 	}
 
 	/*
@@ -57,7 +58,13 @@ public class RegistrationServiceMQ implements RegistrationService {
 		 
 		System.out.println("Start sendFinalGrades "+course_id);
 
-		//TODO convert grades to JSON string and send to registration service
+		System.out.println("Start sendFinalGrades " + course_id);
+
+	    // Convert grades to a JSON string and send it to the registration service
+	    String gradesJson = asJsonString(grades);
+
+	    // Use the RabbitMQ template to send the JSON message to the registration-queue
+	    rabbitTemplate.convertAndSend(registrationQueue.getName(), gradesJson);
 		
 	}
 	
