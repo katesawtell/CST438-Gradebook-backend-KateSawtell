@@ -1,5 +1,7 @@
 package com.cst438.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,7 +37,7 @@ public class RegistrationServiceREST implements RegistrationService {
 	@Override
 	public void sendFinalGrades(int course_id , FinalGradeDTO[] grades) { 
 		
-		//TODO use restTemplate to send final grades to registration service
+		restTemplate.put(registration_url+ "/course/" + course_id + "/finalgrades", grades);
 		
 	}
 	
@@ -50,17 +52,34 @@ public class RegistrationServiceREST implements RegistrationService {
 	 * endpoint used by registration service to add an enrollment to an existing
 	 * course.
 	 */
+	
+	
 	@PostMapping("/enrollment")
 	@Transactional
 	public EnrollmentDTO addEnrollment(@RequestBody EnrollmentDTO enrollmentDTO) {
-		
-		// Receive message from registration service to enroll a student into a course.
+	    // Create a new Enrollment entity from the DTO.
 		
 		System.out.println("GradeBook addEnrollment "+enrollmentDTO);
-		
-		//TODO remove following statement when complete.
-		return null;
-		
+
+	    Enrollment enrollment = new Enrollment();
+	    enrollment.setStudentName(enrollmentDTO.studentName());
+	    enrollment.setStudentEmail(enrollmentDTO.studentEmail());
+
+
+	    Optional<Course> course = courseRepository.findById(enrollmentDTO.courseId());
+	    
+	    
+	    // makes sure a course is there 
+	    if (course.isPresent()) {
+	        Course courseFRL = course.get(); 
+	        enrollment.setCourse(courseFRL);
+	    }
+	   
+	    return enrollmentDTO;
 	}
+	
+
+
+
 
 }
