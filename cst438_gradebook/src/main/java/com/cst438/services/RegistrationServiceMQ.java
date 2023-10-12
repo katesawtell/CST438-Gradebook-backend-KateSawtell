@@ -2,6 +2,7 @@ package com.cst438.services;
 
 
 import org.springframework.amqp.core.Queue;
+import org.springframework.context.annotation.Bean;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,11 @@ public class RegistrationServiceMQ implements RegistrationService {
 
 
 	Queue registrationQueue = new Queue("registration-queue", true);
+	
+	 @Bean
+	    Queue createQueue() {
+	        return new Queue("gradebook-queue");
+	    }
 
 	/*
 	 * Receive message for student added to course
@@ -42,12 +48,7 @@ public class RegistrationServiceMQ implements RegistrationService {
 	public void receive(String message) {
 		
 		System.out.println("Gradebook has received: "+message);
-		    
-	    // Deserialize the message to EnrollmentDTO and update the database
 		EnrollmentDTO enrollmentDTO = fromJsonString(message, EnrollmentDTO.class);
-
-	    // You can use your EnrollmentRepository to save the received enrollment data.
-	    enrollmentRepository.save(enrollmentDTO);
 	}
 
 	/*
@@ -57,14 +58,8 @@ public class RegistrationServiceMQ implements RegistrationService {
 	public void sendFinalGrades(int course_id, FinalGradeDTO[] grades) {
 		 
 		System.out.println("Start sendFinalGrades "+course_id);
-
-		System.out.println("Start sendFinalGrades " + course_id);
-
-	    // Convert grades to a JSON string and send it to the registration service
-	    String gradesJson = asJsonString(grades);
-
-	    // Use the RabbitMQ template to send the JSON message to the registration-queue
-	    rabbitTemplate.convertAndSend(registrationQueue.getName(), gradesJson);
+	    
+	    rabbitTemplate.convertAndSend(registrationQueue.getName(), asJsonString(grades));
 		
 	}
 	

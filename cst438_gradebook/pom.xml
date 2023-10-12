@@ -78,11 +78,7 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- end selenium -->
-		<dependency>
-			<groupId>com.cst438</groupId>
-			<artifactId>JunitExercise2</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		
 	</dependencies>
 
 	<build>
