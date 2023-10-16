@@ -10,7 +10,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.cst438.domain.FinalGradeDTO;
+import com.cst438.domain.Course;
 import com.cst438.domain.CourseRepository;
+import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentDTO;
 import com.cst438.domain.EnrollmentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,14 +45,26 @@ public class RegistrationServiceMQ implements RegistrationService {
 	/*
 	 * Receive message for student added to course
 	 */
-	@RabbitListener(queues = "gradebook-queue")
-	@Transactional
-	public void receive(String message) {
-		
-		System.out.println("Gradebook has received: "+message);
-		EnrollmentDTO enrollmentDTO = fromJsonString(message, EnrollmentDTO.class);
-	}
-
+	 @RabbitListener(queues = "gradebook-queue")
+		@Transactional
+		public void receive(String message) {
+			
+			System.out.println("Gradebook has received: "+message);
+			EnrollmentDTO dto = fromJsonString(message, EnrollmentDTO.class);
+			System.out.println(dto.toString());
+			
+			Course course = courseRepository.findById(dto.courseId()).orElse(null);
+			if (course==null) {
+				System.out.println("Error. Student add to course. course not found "+dto.toString());
+			} else {
+				Enrollment enrollment = new Enrollment();
+				enrollment.setCourse(course);
+				enrollment.setStudentEmail(dto.studentEmail());
+				enrollment.setStudentName(dto.studentName());
+				enrollmentRepository.save(enrollment);
+				System.out.println("End receive enrollment.");
+			}		
+		}
 	/*
 	 * Send final grades to Registration Service 
 	 */
@@ -58,8 +72,10 @@ public class RegistrationServiceMQ implements RegistrationService {
 	public void sendFinalGrades(int course_id, FinalGradeDTO[] grades) {
 		 
 		System.out.println("Start sendFinalGrades "+course_id);
-	    
-	    rabbitTemplate.convertAndSend(registrationQueue.getName(), asJsonString(grades));
+		String message = asJsonString(grades);
+		System.out.println(message);
+		rabbitTemplate.convertAndSend(registrationQueue.getName(), message);
+		System.out.println("End sendFinalGrades ");
 		
 	}
 	

@@ -37,7 +37,8 @@ public class RegistrationServiceREST implements RegistrationService {
 	@Override
 	public void sendFinalGrades(int course_id , FinalGradeDTO[] grades) { 
 		
-		restTemplate.put(registration_url+ "/course/" + course_id + "/finalgrades", grades);
+		restTemplate.put(registration_url+"/course/"+course_id, grades);
+		System.out.println("POST complete.");
 		
 	}
 	
@@ -57,27 +58,29 @@ public class RegistrationServiceREST implements RegistrationService {
 	@PostMapping("/enrollment")
 	@Transactional
 	public EnrollmentDTO addEnrollment(@RequestBody EnrollmentDTO enrollmentDTO) {
-	    // Create a new Enrollment entity from the DTO.
+		
+		// Receive message from registration service to enroll a student into a course.
 		
 		System.out.println("GradeBook addEnrollment "+enrollmentDTO);
-
-	    Enrollment enrollment = new Enrollment();
-	    enrollment.setStudentName(enrollmentDTO.studentName());
-	    enrollment.setStudentEmail(enrollmentDTO.studentEmail());
-
-
-	    Optional<Course> course = courseRepository.findById(enrollmentDTO.courseId());
-	    
-	    
-	    // makes sure a course is there 
-	    if (course.isPresent()) {
-	        Course courseFRL = course.get(); 
-	        enrollment.setCourse(courseFRL);
-	    }
-	   
-	    return enrollmentDTO;
+		Enrollment enrollment = new Enrollment();
+		Course course = courseRepository.findById(enrollmentDTO.courseId()).orElse(null);
+		if (course==null) {
+			System.out.println("Error. Student add to course. course not found "+enrollmentDTO.toString());
+			return null;
+		} else {
+			enrollment.setCourse(course);
+			enrollment.setStudentEmail(enrollmentDTO.studentEmail());
+			enrollment.setStudentName(enrollmentDTO.studentName());
+			enrollmentRepository.save(enrollment);
+			EnrollmentDTO result = new EnrollmentDTO(
+					enrollment.getId(), 
+					enrollment.getStudentEmail(), 
+					enrollment.getStudentName(), 
+					enrollment.getCourse().getCourse_id());
+			return result;
+		}
+		
 	}
-	
 
 
 
