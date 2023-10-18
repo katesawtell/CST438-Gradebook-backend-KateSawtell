@@ -6,7 +6,7 @@ INSERT INTO course (year, semester, course_id, title, instructor)  VALUES
 (2020,'Fall',31249,'CST 237 - Intro to Computer Architecture','sislam@csumb.edu'),
 (2020,'Fall',31253,'BUS 307 - Finance','hwieland@csumb.edu'),
 (2020,'Fall',31747,'CST 238 - Introduction to Data Structures','jgross@csumb.edu'),
-(2021,'Fall',40443,'CST 999 -TESTTTTT', 'dwisneski@csumb.edu');
+(2021,'Fall',40443,'CST 999 -TEST', 'dwisneski@csumb.edu');
 
 insert into assignment (id, due_date, name, course_id) values 
 (1, '2021-09-01', 'db design', 31045),
