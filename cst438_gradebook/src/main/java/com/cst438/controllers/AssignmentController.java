@@ -1,5 +1,4 @@
 package com.cst438.controllers;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.cst438.DTO.AssignmentDTO;
 import com.cst438.domain.Assignment;
-import com.cst438.domain.AssignmentDTO;
 import com.cst438.domain.AssignmentRepository;
 import com.cst438.domain.Course;
 import com.cst438.domain.CourseRepository;
+import java.security.Principal;
 
 @RestController
 @CrossOrigin 
