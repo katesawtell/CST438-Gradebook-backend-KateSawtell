@@ -14,7 +14,7 @@
 	<name>cst438_gradebook</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>8</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 
@@ -104,7 +104,12 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- end selenium -->
-		
+
+		<dependency>
+			<groupId>com.cst438</groupId>
+			<artifactId>MultiplyGame1</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -134,6 +139,7 @@
 			</releases>
 		</repository>
 	</repositories>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>spring-milestones</id>

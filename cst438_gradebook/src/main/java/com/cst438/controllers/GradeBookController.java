@@ -52,8 +52,8 @@ public class GradeBookController {
 	 * id - assignment id
 	 */
 	@GetMapping("/gradebook/{id}")
-	public GradeDTO[] getGradebook(@PathVariable("id") Integer assignmentId  ) {
-		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+	public GradeDTO[] getGradebook(@PathVariable("id") Integer assignmentId, Principal principal) {
+		String email = principal.getName();  // user name (should be instructor's email) 
 		Assignment assignment = checkAssignment(assignmentId, email);
 		// get the enrollments for the course
 		// for each enrollment, get the current grade for assignment, 
@@ -79,10 +79,10 @@ public class GradeBookController {
 	 */
 	@PostMapping("/course/{course_id}/finalgrades")
 	@Transactional
-	public void calcFinalGrades(@PathVariable int course_id) {
+	public void calcFinalGrades(@PathVariable int course_id, Principal principal) {
 		System.out.println("Gradebook - calcFinalGrades for course " + course_id);
 		// check that this request is from the course instructor 
-		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+		String email = principal.getName(); // user name (should be instructor's email) 
 		Course c = courseRepository.findById(course_id).orElse(null);
 		if (!c.getInstructor().equals(email)) {
 			throw new ResponseStatusException( HttpStatus.UNAUTHORIZED, "Not Authorized. " );
@@ -112,8 +112,8 @@ public class GradeBookController {
 	 */
 	@PutMapping("/gradebook/{id}")
 	@Transactional
-	public void updateGradebook (@RequestBody GradeDTO[] grades, @PathVariable("id") Integer assignmentId ) {
-		String email = "dwisneski@csumb.edu";  // user name (should be instructor's email) 
+	public void updateGradebook (@RequestBody GradeDTO[] grades, @PathVariable("id") Integer assignmentId, Principal principal ) {
+		String email = principal.getName();  // user name (should be instructor's email) 
 		checkAssignment(assignmentId, email);  // check that user name matches instructor email of the course.
 		// for each grade, update the assignment grade in database 		
 		for (GradeDTO g : grades) {
