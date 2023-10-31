@@ -1,6 +1,7 @@
-package com.cst438.domain;
+package com.cst438;
 
 import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +13,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.cst438.AuthEntryPoint;
-import com.cst438.services.UserDetailsServiceImpl;
+import com.cst438.service.UserDetailsServiceImpl;
 
 
 @SuppressWarnings("deprecation")
@@ -72,14 +71,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.passwordEncoder(new BCryptPasswordEncoder());
 	}
 
-    @Bean
-    AuthenticationManager getAuthenticationManager() throws
-            Exception {
+	@Bean
+	public AuthenticationManager getAuthenticationManager() throws 
+	Exception {
 		return authenticationManager();
 	}
-    
-
-    
-
-    
 }
