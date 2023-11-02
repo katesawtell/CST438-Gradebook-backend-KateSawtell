@@ -1,6 +1,6 @@
 package com.cst438.services;
 
-import com.cst438.domain.FinalGradeDTO;
+import com.cst438.DTO.FinalGradeDTO;
 
 public interface RegistrationService {
 	

@@ -12,9 +12,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.cst438.DTO.GradeDTO;
 import com.cst438.domain.AssignmentGrade;
 import com.cst438.domain.AssignmentGradeRepository;
-import com.cst438.domain.GradeDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /* 

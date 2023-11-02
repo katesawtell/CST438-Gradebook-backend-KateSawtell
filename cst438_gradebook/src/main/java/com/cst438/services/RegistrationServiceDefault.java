@@ -3,7 +3,7 @@ package com.cst438.services;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import com.cst438.domain.FinalGradeDTO;
+import com.cst438.DTO.FinalGradeDTO;
 
 @Service
 @ConditionalOnProperty(prefix="registration", name="service", havingValue = "default", matchIfMissing=true)
